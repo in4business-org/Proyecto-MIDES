@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/* Dark variant: applies when element is inside .dark (on <html>) */
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   LIGHT MODE — default
+   ============================================================ */
+:root {
+  --background: #f8f7f4;
+  --foreground: #1a1a2e;
+  --card: #ffffff;
+  --card-foreground: #1a1a2e;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a2e;
+
+  /* Brand blue — dark in light mode for contrast */
+  --primary: #1a3a6b;
+  --primary-foreground: #ffffff;
+
+  --secondary: #eef2f7;
+  --secondary-foreground: #1a1a2e;
+  --muted: #f1f0ed;
+  --muted-foreground: #374151;
+  --accent: #e8edf5;
+  --accent-foreground: #1a1a2e;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #d1d9e6;
+  --input: #d1d9e6;
+  --ring: #1a3a6b;
+
+  --success: #16a34a;
+  --warning: #d97706;
+}
+
+/* ============================================================
+   DARK MODE — .dark on <html>
+   ============================================================ */
+.dark {
+  --background: #1a1a1a;
+  --foreground: #e8e8e8;
+  --card: #242424;
+  --card-foreground: #e8e8e8;
+  --popover: #242424;
+  --popover-foreground: #e8e8e8;
+
+  --primary: #4f7ef5;
+  --primary-foreground: #ffffff;
+
+  --secondary: #2e2e2e;
+  --secondary-foreground: #e8e8e8;
+  --muted: #2e2e2e;
+  --muted-foreground: #9ca3af;
+  --accent: #2e2e2e;
+  --accent-foreground: #e8e8e8;
+
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+  --border: #333333;
+  --input: #333333;
+  --ring: #4f7ef5;
+
+  --success: #34d399;
+  --warning: #fbbf24;
+}
+
+/* ============================================================
+   TAILWIND TOKEN MAPPING
+   @theme inline lets Tailwind reference these as CSS variables
+   so they respond to .dark toggling at runtime.
+   ============================================================ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Lora", Georgia, serif;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    background-color: var(--background);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Subtle ambient glow — adapts per theme */
+    background-image:
+      radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--primary) 6%, transparent) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--primary) 3%, transparent) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 100px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+
+  /* Force option elements to follow the theme in all browsers */
+  select option {
+    background-color: var(--card);
+    color: var(--foreground);
+  }
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-up   { animation: fade-up   0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-fade-in   { animation: fade-in   0.4s ease-out both; }
+.animate-scale-in  { animation: scale-in  0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
