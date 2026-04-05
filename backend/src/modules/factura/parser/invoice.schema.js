@@ -2,19 +2,6 @@
  * JSON Schema for a single invoice item, used as Gemini's response schema.
  * Mirrors the TypeScript interface from invoice_parcer.
  */
-const INVOICE_CATEGORIES_SCHEMA = [
-  'Maquinaria',
-  'Equipos',
-  'Instalaciones',
-  'Vehiculos',
-  'MEIV/Imprevistos',
-  'Materiales',
-  'Mano de Obra Directa',
-  'Mano de Obra Indirecta',
-  'Leyes Sociales',
-  'Honorarios',
-  'OC/Imprevistos',
-];
 
 const INVOICE_ITEM_SCHEMA = {
   type: 'OBJECT',
@@ -22,36 +9,27 @@ const INVOICE_ITEM_SCHEMA = {
     descripcion: { type: 'STRING', nullable: true },
     serie_numero_factura: { type: 'STRING', nullable: true },
     fecha_comprobante: { type: 'STRING', nullable: true },
+    fecha_vencimiento: { type: 'STRING', nullable: true },
     cantidad: { type: 'NUMBER', nullable: true },
     rut_emisor: { type: 'STRING', nullable: true },
     razon_social_emisor: { type: 'STRING', nullable: true },
     rut_receptor: { type: 'STRING', nullable: true },
     razon_social_receptor: { type: 'STRING', nullable: true },
     moneda: { type: 'STRING', enum: ['$', 'USD'], nullable: true },
-    subtotal: { type: 'NUMBER', nullable: true },
-    categoria: {
-      type: 'STRING',
-      enum: INVOICE_CATEGORIES_SCHEMA,
-      nullable: true,
-    },
-    tipo_comprobante: {
-      type: 'STRING',
-      enum: ['Factura', 'Presupuesto'],
-      nullable: true,
-    },
+    total: { type: 'NUMBER', nullable: true }
   },
   required: [
     'descripcion',
     'serie_numero_factura',
     'fecha_comprobante',
+    'fecha_vencimiento',
     'cantidad',
     'rut_emisor',
     'razon_social_emisor',
     'rut_receptor',
     'razon_social_receptor',
     'moneda',
-    'subtotal',
-    'categoria',
+    'total',
   ],
 };
 
@@ -60,4 +38,4 @@ const INVOICE_RESPONSE_SCHEMA = {
   items: INVOICE_ITEM_SCHEMA,
 };
 
-module.exports = { INVOICE_ITEM_SCHEMA, INVOICE_RESPONSE_SCHEMA, INVOICE_CATEGORIES_SCHEMA };
+module.exports = { INVOICE_ITEM_SCHEMA, INVOICE_RESPONSE_SCHEMA };

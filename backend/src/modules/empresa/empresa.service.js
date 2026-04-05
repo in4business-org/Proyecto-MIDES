@@ -1,13 +1,12 @@
 const prisma = require('../../config/prisma');
 
 const CAMPOS_EMPRESA = [
-  'rut', 'nombre', 'razon_social', 'domicilio_constituido', 'domicilio_fiscal',
-  'telefono', 'email', 'giro', 'codigo_ciiu', 'fecha_balance', 'tipo_contribuyente',
+  'rut', 'nombre', 'razon_social', 'domicilio_fiscal', 'telefono', 'email',
 ];
 
 class EmpresaService {
-  async crear(rut, nombre) {
-    const empresaId = `${rut}_${nombre.replace(/\s+/g, '_')}`;
+  async crear(rut, nombre, razon_social, domicilio_fiscal, telefono, email) {
+    const empresaId = rut;
 
     await prisma.empresa.upsert({
       where: { rut },
@@ -15,7 +14,11 @@ class EmpresaService {
       create: {
         id: empresaId,
         rut,
-        nombre
+        nombre,
+        razon_social,
+        domicilio_fiscal,
+        telefono,
+        email,
       }
     });
 
@@ -37,14 +40,14 @@ class EmpresaService {
     for (const campo of CAMPOS_EMPRESA) {
       if (datos[campo] !== undefined) validData[campo] = datos[campo];
     }
-    
+
     try {
       await prisma.empresa.update({
         where: { id: empresaId },
         data: validData
       });
       return true;
-    } catch(e) {
+    } catch (e) {
       return false;
     }
   }

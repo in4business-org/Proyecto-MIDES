@@ -15,13 +15,14 @@ Usá exactamente esta estructura:
     "descripcion": "string o null",
     "serie_numero_factura": "string o null",
     "fecha_comprobante": "DD/MM/YYYY o null",
+    "fecha_vencimiento": "DD/MM/YYYY o null",
     "cantidad": 1,
     "rut_emisor": "string o null",
     "razon_social_emisor": "string o null",
     "rut_receptor": "string o null",
     "razon_social_receptor": "string o null",
     "moneda": "$ | USD | null",
-    "subtotal": number o null,
+    "total": number o null,
     "categoria": "Maquinaria | Equipos | Instalaciones | Vehiculos | Materiales | Mano de Obra | Leyes Sociales | Honorarios | null",
     "tipo_comprobante": "Factura | Presupuesto | null"
   }
@@ -31,12 +32,24 @@ Usá exactamente esta estructura:
 Reglas generales:
 - Debe haber exactamente un objeto por comprobante (factura), sin importar cuántos ítems tenga.
 - En "descripcion" resumí brevemente el contenido de la factura (qué se compró o qué servicio fue).
-- En "subtotal" usá el total o subtotal de la factura completa, no el de un ítem individual.
+- En "total" usá el total de la factura completa, no el de un ítem individual.
 - No inventes datos.
 - Si un dato no se puede determinar con seguridad, devolvé null.
-- "subtotal" debe ser numérico, no string.
+- "total" debe ser numérico, no string.
 - Remové separadores de miles.
 - Usá punto como separador decimal.
+
+Reglas de fechas:
+- El formato de fecha debe ser "DD/MM/YYYY".
+- Si no se puede determinar el formato de fecha, devolvé null.
+- No asumas que el formato es siempre el mismo, algunas facturas pueden usar "YYYY-MM-DD" o "MM/DD/YYYY".
+- Si la fecha es ilegible o no se puede interpretar con confianza, devolvé null.
+
+Fecha de vencimiento:
+- Si la factura no tiene fecha de vencimiento o no se puede determinar, devolvé null.
+- No asumas que la fecha de vencimiento siempre está presente o en un formato específico.
+- Normalmente la fecha de vencimiento se encuentra en la parte inferior de la factura, pero no siempre es así. Buscá pistas como "Fecha de Vencimiento", "Vto", "Venc.", etc.
+- Tambien puede encontrarse como vencimiento de CAE en facturas electrónicas.
 
 Reglas de emisor y receptor:
 - "razon_social_emisor" debe corresponder a la empresa que emite la factura.
@@ -67,31 +80,6 @@ Reglas de serie_numero_factura:
   - "A 095921" -> "A095921"
   - "A-095921" -> "A095921"
   - "A / 095921" -> "A095921"
-
-Además, devolvé un campo "categoria" para cada item.
-
-La categoría debe ser una de estas opciones exactas:
-- 'Maquinaria',
-- 'Equipos',
-- 'Instalaciones',
-- 'Vehiculos',
-- 'MEIV/Imprevistos',
-- 'Materiales',
-- 'Mano de Obra Directa',
-- 'Mano de Obra Indirecta',
-- 'Leyes Sociales',
-- 'Honorarios',
-- 'OC/Imprevistos',
-
-Reglas para categoria:
-- Elegí la categoría más probable según la descripción del item y el contexto de la factura.
-- Si no es posible inferirla con suficiente confianza, devolver null.
-- No inventar categorías fuera de la lista.
-
-Reglas para tipo_comprobante:
-- Si el documento es una factura comercial (e-factura, factura, factura ticket, etc.), devolver "Factura".
-- Si el documento es un presupuesto, cotización o proforma, devolver "Presupuesto".
-- Si no se puede determinar con seguridad, devolver null.
 
 Validación final:
 - La salida debe ser JSON válido.
