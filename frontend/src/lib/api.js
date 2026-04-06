@@ -41,19 +41,10 @@ export const empresas = {
 // -- Proyectos
 export const proyectos = {
   list: (empresaId) => request(`/empresas/${empresaId}/proyectos`),
-  create: (empresaId, anioPresentacion, duracionSeguimiento, fechaPresentacion) =>
+  create: (empresaId, convenio = null) =>
     request(`/empresas/${empresaId}/proyectos`, {
       method: 'POST',
-      body: JSON.stringify({
-        anio_presentacion: anioPresentacion,
-        duracion_seguimiento: duracionSeguimiento,
-        fecha_presentacion: fechaPresentacion || null,
-      }),
-    }),
-  updateExpediente: (empresaId, proyectoId, expediente) =>
-    request(`/empresas/${empresaId}/proyectos/${proyectoId}/expediente`, {
-      method: 'PATCH',
-      body: JSON.stringify({ expediente }),
+      body: JSON.stringify({ convenio: convenio || null }),
     }),
   updateMetadata: (empresaId, proyectoId, data) =>
     request(`/empresas/${empresaId}/proyectos/${proyectoId}/metadata`, { method: 'PATCH', body: JSON.stringify(data) }),
@@ -61,52 +52,45 @@ export const proyectos = {
 
 // -- Facturas
 export const facturas = {
-  upload: (empresaId, proyectoId, periodo, files) => {
+  upload: (empresaId, proyectoId, files) => {
     const fd = new FormData();
     files.forEach(f => fd.append('files', f));
-    return request(`/empresas/${empresaId}/proyectos/${proyectoId}/${periodo}/upload`, { method: 'POST', body: fd });
+    return request(`/empresas/${empresaId}/proyectos/${proyectoId}/upload`, { method: 'POST', body: fd });
   },
-  uploadAndProcess: (empresaId, proyectoId, periodo, files) => {
+  uploadAndProcess: (empresaId, proyectoId, files) => {
     const fd = new FormData();
     files.forEach(f => fd.append('files', f));
-    return request(`/empresas/${empresaId}/proyectos/${proyectoId}/${periodo}/subir-y-procesar`, { method: 'POST', body: fd });
+    return request(`/empresas/${empresaId}/proyectos/${proyectoId}/subir-y-procesar`, { method: 'POST', body: fd });
   },
-  getResults: (empresaId, proyectoId, periodo) =>
-    request(`/empresas/${empresaId}/proyectos/${proyectoId}/${periodo}/resultados`),
-  analyze: (empresaId, proyectoId, periodo) =>
-    request(`/empresas/${empresaId}/proyectos/${proyectoId}/${periodo}/analizar`),
-  exportExcel: (empresaId, proyectoId, periodo) =>
-    request(`/empresas/${empresaId}/proyectos/${proyectoId}/${periodo}/excel`, { method: 'POST', body: new FormData() }),
+  getResults: (empresaId, proyectoId) =>
+    request(`/empresas/${empresaId}/proyectos/${proyectoId}/resultados`),
+  analyze: (empresaId, proyectoId) =>
+    request(`/empresas/${empresaId}/proyectos/${proyectoId}/analizar`),
+  exportExcel: (empresaId, proyectoId) =>
+    request(`/empresas/${empresaId}/proyectos/${proyectoId}/excel`, { method: 'POST', body: new FormData() }),
+  reprocesar: (empresaId, proyectoId, archivos) =>
+    request(`/empresas/${empresaId}/proyectos/${proyectoId}/reprocesar`, {
+      method: 'POST',
+      body: JSON.stringify({ archivos }),
+    }),
+  updateResults: (empresaId, proyectoId, results) =>
+    request(`/empresas/${empresaId}/proyectos/${proyectoId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ results }),
+    }),
   // Simple mode
   simpleUpload: (files) => {
     const fd = new FormData();
     files.forEach(f => fd.append('files', f));
     return request('/simple/upload', { method: 'POST', body: fd });
   },
-  reprocesar: (empresaId, proyectoId, periodo, archivos) =>
-    request(`/empresas/${empresaId}/proyectos/${proyectoId}/${periodo}/reprocesar`, {
-      method: 'POST',
-      body: JSON.stringify({ archivos }),
-    }),
-  updateResults: (empresaId, proyectoId, periodo, results) =>
-    request(`/empresas/${empresaId}/proyectos/${proyectoId}/${periodo}`, {
-      method: 'PUT',
-      body: JSON.stringify({ results }),
-    }),
-  downloadTemplate: (empresaId, proyectoId, periodo) =>
-    request(`/empresas/${empresaId}/proyectos/${proyectoId}/${periodo}/template-importar`),
-  importar: (empresaId, proyectoId, periodo, file) => {
-    const fd = new FormData();
-    fd.append('file', file);
-    return request(`/empresas/${empresaId}/proyectos/${proyectoId}/${periodo}/importar`, { method: 'POST', body: fd });
-  },
   simpleGetResults: () => request('/simple/resultados'),
   simpleAnalyze: () => request('/simple/analizar'),
   simpleExcel: () => request('/simple/excel'),
-  simpleAssociate: (empresaId, proyectoId, periodo) =>
+  simpleAssociate: (empresaId, proyectoId) =>
     request('/simple/asociar', {
       method: 'POST',
-      body: JSON.stringify({ empresaId, proyectoId, periodo }),
+      body: JSON.stringify({ empresaId, proyectoId }),
     }),
 };
 

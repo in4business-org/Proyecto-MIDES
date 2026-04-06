@@ -62,7 +62,7 @@ export function Dialog({ open, onClose, children }) {
 
 export function DialogContent({ className, children, onClose, ...props }) {
   return (
-    <div className={cn('rounded-xl ring-1 ring-border bg-card p-6 shadow-lg shadow-black/20', className)} {...props}>
+    <div className={cn('rounded-xl border border-border bg-card p-6', className)} {...props}>
       {onClose && (
         <button
           onClick={onClose}

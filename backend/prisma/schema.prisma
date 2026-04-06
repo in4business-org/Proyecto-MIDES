@@ -24,7 +24,8 @@ model Empresa {
 model Proyecto {
   id                   String     @id @default(uuid())
   empresaId            String
-  convenio             String     @unique
+  convenio             String?    @unique
+  fecha_inicio         String?
   empresa              Empresa    @relation(fields: [empresaId], references: [id])
   fecha_creacion       String
   facturas             Factura[]

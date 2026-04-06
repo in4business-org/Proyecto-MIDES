@@ -17,7 +17,7 @@ CREATE TABLE "Empresa" (
 CREATE TABLE "Proyecto" (
     "id" TEXT NOT NULL,
     "empresaId" TEXT NOT NULL,
-    "convenio" TEXT NOT NULL,
+    "convenio" TEXT,
     "fecha_creacion" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Save, Plus, ArrowUpRight, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { LoadingState, Spinner } from '@/components/ui/loading'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
@@ -12,14 +11,9 @@ import { empresas as empApi, proyectos as projApi } from '@/lib/api'
 const FIELDS = [
   { key: 'razon_social', label: 'Razón Social', span: 1 },
   { key: 'rut', label: 'RUT', span: 1, readonly: true },
-  { key: 'domicilio_constituido', label: 'Domicilio Constituido', span: 1 },
   { key: 'domicilio_fiscal', label: 'Domicilio Fiscal', span: 1 },
   { key: 'telefono', label: 'Teléfono', span: 1 },
   { key: 'email', label: 'Email', span: 1 },
-  { key: 'giro', label: 'Giro', span: 1 },
-  { key: 'codigo_ciiu', label: 'Código CIIU', span: 1 },
-  { key: 'fecha_balance', label: 'Fecha de próximo balance', span: 1, type: 'date' },
-  { key: 'tipo_contribuyente', label: 'Tipo de Contribuyente', span: 1 },
 ]
 
 export default function EmpresaDetail() {
@@ -32,7 +26,7 @@ export default function EmpresaDetail() {
   const [projLoading, setProjLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [creating, setCreating] = useState(false)
-  const [projForm, setProjForm] = useState({ anio: new Date().getFullYear(), duracion: 5, fecha: '' })
+  const [projForm, setProjForm] = useState({ convenio: '' })
 
   const [activeTab, setActiveTab] = useState('proyectos')
   const [configProj, setConfigProj] = useState(null)
@@ -54,10 +48,10 @@ export default function EmpresaDetail() {
   const handleCreateProj = async () => {
     setCreating(true)
     try {
-      const newProj = await projApi.create(empresaId, projForm.anio, projForm.duracion, projForm.fecha || null)
+      await projApi.create(empresaId, projForm.convenio || null)
       setDialogOpen(false)
-      setProyectos(prev => [...prev, newProj])
-      setProjForm({ anio: new Date().getFullYear(), duracion: 5, fecha: '' })
+      setProjForm({ convenio: '' })
+      projApi.list(empresaId).then(setProyectos).catch(console.error)
     } catch (err) {
       console.error(err)
       projApi.list(empresaId).then(setProyectos).catch(console.error)
@@ -66,11 +60,7 @@ export default function EmpresaDetail() {
   }
 
   const handleOpenConfig = (p) => {
-    setConfigForm({
-      fecha_presentacion: p.fecha_presentacion || '',
-      anio_presentacion: p.anio_presentacion || '',
-      duracion_seguimiento: p.duracion_seguimiento ?? 1,
-    })
+    setConfigForm({ convenio: p.convenio || '', fecha_inicio: p.fecha_inicio || '' })
     setConfigProj(p)
   }
 
@@ -78,13 +68,12 @@ export default function EmpresaDetail() {
     setSavingConfig(true)
     try {
       await projApi.updateMetadata(empresaId, configProj.id, {
-        fecha_presentacion: configForm.fecha_presentacion || null,
-        anio_presentacion: configForm.anio_presentacion ? Number(configForm.anio_presentacion) : null,
-        duracion_seguimiento: Number(configForm.duracion_seguimiento),
+        convenio: configForm.convenio || null,
+        fecha_inicio: configForm.fecha_inicio || null,
       })
       setProyectos(prev => prev.map(p =>
         p.id === configProj.id
-          ? { ...p, ...configForm, anio_presentacion: Number(configForm.anio_presentacion), duracion_seguimiento: Number(configForm.duracion_seguimiento) }
+          ? { ...p, convenio: configForm.convenio || null, fecha_inicio: configForm.fecha_inicio || null }
           : p
       ))
       setConfigProj(null)
@@ -157,7 +146,7 @@ export default function EmpresaDetail() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/80 bg-muted/40 text-left">
-                    {['Fecha creación', 'Fecha presentación', 'Expediente', 'Año', 'Seguimiento', ''].map((h) => (
+                    {['Convenio', 'Fecha creación', 'Fecha inicio', ''].map((h) => (
                       <th key={h} className="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
                         {h}
                       </th>
@@ -166,31 +155,16 @@ export default function EmpresaDetail() {
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {proyectos.map((p) => {
-                    const hasDocs = !!p.expediente
                     return (
                       <tr key={p.id} className="bg-card hover:bg-accent/40 transition-colors group">
+                        <td className="px-4 py-3 text-[13px] whitespace-nowrap font-mono text-muted-foreground">
+                          {p.convenio || '--'}
+                        </td>
                         <td className="px-4 py-3 text-[13px] text-muted-foreground/80 whitespace-nowrap">
                           {p.fecha_creacion ? new Date(p.fecha_creacion).toLocaleDateString() : '--'}
                         </td>
                         <td className="px-4 py-3 text-[13px] text-muted-foreground/80 whitespace-nowrap">
-                          {p.fecha_presentacion || '--'}
-                        </td>
-                        <td className="px-4 py-3 text-[13px] whitespace-nowrap">
-                          {hasDocs ? (
-                            <Badge variant="secondary" className="bg-success/15 text-success hover:bg-success/25 border-success/20 font-medium">
-                              {p.expediente}
-                            </Badge>
-                          ) : (
-                            <Badge variant="secondary" className="bg-warning/15 text-warning hover:bg-warning/25 border-warning/20 font-medium">
-                              Sin expediente
-                            </Badge>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-[13px] text-muted-foreground whitespace-nowrap">
-                          {p.anio_presentacion}
-                        </td>
-                        <td className="px-4 py-3 text-[13px] text-muted-foreground whitespace-nowrap">
-                          {p.duracion_seguimiento} años
+                          {p.fecha_inicio ? new Date(p.fecha_inicio).toLocaleDateString() : '--'}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-1.5">
@@ -262,42 +236,26 @@ export default function EmpresaDetail() {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label htmlFor="config-fecha" className="text-[12px] font-medium text-foreground">Fecha de presentación</label>
+              <label htmlFor="config-convenio" className="text-[12px] font-medium text-foreground">Convenio</label>
               <Input
-                id="config-fecha"
-                type="date"
-                value={configForm.fecha_presentacion || ''}
-                onChange={(e) => {
-                  const fecha = e.target.value
-                  const anio = fecha ? new Date(fecha).getFullYear() : configForm.anio_presentacion
-                  setConfigForm(f => ({ ...f, fecha_presentacion: fecha, anio_presentacion: anio || '' }))
-                }}
+                id="config-convenio"
+                placeholder="Ej: CONV-2025-001"
+                value={configForm.convenio || ''}
+                onChange={(e) => setConfigForm(f => ({ ...f, convenio: e.target.value }))}
                 className="h-9 text-[13px]"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label htmlFor="config-anio" className="text-[12px] font-medium text-foreground">Año de presentación</label>
-                <Input
-                  id="config-anio"
-                  type="number"
-                  value={configForm.anio_presentacion || ''}
-                  onChange={(e) => setConfigForm(f => ({ ...f, anio_presentacion: e.target.value }))}
-                  className="h-9 text-[13px]"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label htmlFor="config-duracion" className="text-[12px] font-medium text-foreground">Años de seguimiento</label>
-                <Input
-                  id="config-duracion"
-                  type="number"
-                  min="0"
-                  max="10"
-                  value={configForm.duracion_seguimiento ?? ''}
-                  onChange={(e) => setConfigForm(f => ({ ...f, duracion_seguimiento: e.target.value }))}
-                  className="h-9 text-[13px]"
-                />
-              </div>
+            <div className="space-y-1.5">
+              <label htmlFor="config-fecha-inicio" className="text-[12px] font-medium text-foreground">
+                Fecha de inicio de gastos <span className="text-muted-foreground font-normal">(opcional)</span>
+              </label>
+              <Input
+                id="config-fecha-inicio"
+                type="date"
+                value={configForm.fecha_inicio || ''}
+                onChange={(e) => setConfigForm(f => ({ ...f, fecha_inicio: e.target.value }))}
+                className="h-9 text-[13px]"
+              />
             </div>
           </div>
           <DialogFooter className="mt-2">
@@ -317,18 +275,8 @@ export default function EmpresaDetail() {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label htmlFor="proj-fecha" className="text-[12px] font-medium text-foreground">Fecha de presentación</label>
-              <Input id="proj-fecha" type="date" value={projForm.fecha} onChange={(e) => setProjForm({ ...projForm, fecha: e.target.value })} className="h-9 text-[13px]" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label htmlFor="proj-anio" className="text-[12px] font-medium text-foreground">Año de presentación</label>
-                <Input id="proj-anio" type="number" value={projForm.anio} onChange={(e) => setProjForm({ ...projForm, anio: parseInt(e.target.value) })} className="h-9 text-[13px]" />
-              </div>
-              <div className="space-y-1.5">
-                <label htmlFor="proj-duracion" className="text-[12px] font-medium text-foreground">Años seguimiento</label>
-                <Input id="proj-duracion" type="number" min="1" max="10" value={projForm.duracion} onChange={(e) => setProjForm({ ...projForm, duracion: parseInt(e.target.value) })} className="h-9 text-[13px]" />
-              </div>
+              <label htmlFor="proj-convenio" className="text-[12px] font-medium text-foreground">Convenio <span className="text-muted-foreground font-normal">(opcional)</span></label>
+              <Input id="proj-convenio" placeholder="Ej: CONV-2025-001" value={projForm.convenio} onChange={(e) => setProjForm({ ...projForm, convenio: e.target.value })} className="h-9 text-[13px]" />
             </div>
           </div>
           <DialogFooter className="mt-2">

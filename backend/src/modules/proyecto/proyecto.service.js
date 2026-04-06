@@ -14,7 +14,7 @@ class ProyectoService {
                 id: proyectoId,
                 empresaId,
                 fecha_creacion: fechaHoy,
-                convenio,
+                convenio: convenio || null,
             }
         });
 
@@ -30,12 +30,14 @@ class ProyectoService {
             id: p.id,
             fecha_creacion: p.fecha_creacion,
             convenio: p.convenio,
+            fecha_inicio: p.fecha_inicio,
         }));
     }
 
     async actualizarMetadata(empresaId, proyectoId, datos) {
         const camposEditables = [
             'convenio',
+            'fecha_inicio',
         ];
 
         const dataToUpdate = {};
@@ -61,6 +63,7 @@ class ProyectoService {
             id: p.id,
             fecha_creacion: p.fecha_creacion,
             convenio: p.convenio,
+            fecha_inicio: p.fecha_inicio,
         };
     }
 

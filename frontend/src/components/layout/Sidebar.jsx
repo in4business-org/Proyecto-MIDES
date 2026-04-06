@@ -160,7 +160,7 @@ export function Sidebar() {
         )}>
           {!collapsed && (
             <span className="text-[13px] font-semibold tracking-wide text-foreground/80 truncate">
-              COMAP
+              MIDES
             </span>
           )}
           <button
@@ -317,10 +317,7 @@ export function Sidebar() {
                         <span className="text-[11px] text-muted-foreground/40 py-1 px-1">Sin proyectos</span>
                       ) : (
                         proyectosMap[emp.id].map(p => {
-                          const label = p.expediente
-                            || p.fecha_presentacion
-                            || p.fecha_creacion
-                            || `Proyecto ${p.anio_presentacion}`
+                          const label = p.convenio || p.id
                           const isProjActive = location.pathname === `/empresas/${emp.id}/proyectos/${p.id}`
                           return (
                             <NavLink
@@ -340,9 +337,11 @@ export function Sidebar() {
                               )} />
                               <div className="flex flex-col min-w-0">
                                 <span className="text-[12px] truncate leading-tight font-medium">{label}</span>
-                                <span className="text-[9.5px] opacity-50 font-mono tracking-tight">
-                                  {p.anio_presentacion} · {p.duracion_seguimiento} años
-                                </span>
+                                {p.fecha_inicio && (
+                                  <span className="text-[9.5px] opacity-50 font-mono tracking-tight">
+                                    Inicio: {p.fecha_inicio}
+                                  </span>
+                                )}
                               </div>
                             </NavLink>
                           )
