@@ -7,10 +7,9 @@ const router = Router({ mergeParams: true });
 router.post('/', async (req, res) => {
   try {
     const { empresaId } = req.params;
-    const { anio_presentacion, duracion_seguimiento, fecha_presentacion } = req.body;
+    const { convenio } = req.body;
     const proyecto_id = await proyectoService.crear(
-      empresaId, parseInt(anio_presentacion), parseInt(duracion_seguimiento),
-      fecha_presentacion || null,
+      empresaId, convenio
     );
     res.json({ proyecto_id });
   } catch (e) {
@@ -28,18 +27,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// PATCH /api/empresas/:empresaId/proyectos/:proyectoId/expediente
-router.patch('/:proyectoId/expediente', async (req, res) => {
-  try {
-    const { empresaId, proyectoId } = req.params;
-    const ok = await proyectoService.actualizarExpediente(empresaId, proyectoId, req.body.expediente);
-    if (!ok) return res.status(404).json({ error: 'Proyecto no encontrado' });
-    res.json({ ok: true });
-  } catch(e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
 // PATCH /api/empresas/:empresaId/proyectos/:proyectoId/metadata
 router.patch('/:proyectoId/metadata', async (req, res) => {
   try {
@@ -47,7 +34,7 @@ router.patch('/:proyectoId/metadata', async (req, res) => {
     const ok = await proyectoService.actualizarMetadata(empresaId, proyectoId, req.body);
     if (!ok) return res.status(404).json({ error: 'Proyecto no encontrado' });
     res.json({ ok: true });
-  } catch(e) {
+  } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });

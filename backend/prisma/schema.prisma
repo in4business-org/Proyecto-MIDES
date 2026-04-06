@@ -13,14 +13,9 @@ model Empresa {
   rut                   String     @unique
   nombre                String
   razon_social          String?
-  domicilio_constituido String?
   domicilio_fiscal      String?
   telefono              String?
   email                 String?
-  giro                  String?
-  codigo_ciiu           String?
-  fecha_balance         String?
-  tipo_contribuyente    String?
   proyectos             Proyecto[]
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
@@ -29,15 +24,10 @@ model Empresa {
 model Proyecto {
   id                   String     @id @default(uuid())
   empresaId            String
+  convenio             String?    @unique
+  fecha_inicio         String?
   empresa              Empresa    @relation(fields: [empresaId], references: [id])
   fecha_creacion       String
-  fecha_presentacion   String?
-  anio_presentacion    Int?
-  duracion_seguimiento Int?
-  cotizacion_ui        Float?
-  cotizacion_usd       Float?
-  expediente           String?
-  checklists           ChecklistItem[]
   facturas             Factura[]
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
@@ -45,51 +35,33 @@ model Proyecto {
   @@index([empresaId])
 }
 
-model ChecklistItem {
-  id           String     @id @default(uuid())
-  proyectoId   String
-  proyecto     Proyecto   @relation(fields: [proyectoId], references: [id])
-  periodo      String
-  item_id      String
-  estado       String     @default("pendiente")
-  archivo      String?
-  nota_usuario String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  @@unique([proyectoId, periodo, item_id])
-}
-
 model Factura {
   id                    String    @id @default(uuid())
   proyectoId            String?
   proyecto              Proyecto? @relation(fields: [proyectoId], references: [id])
-  periodo               String?
   archivo               String?
   descripcion           String?
+  serie_factura         String?
   numero_factura        String?
-  proveedor             String?
-  rut                   String?
+  razon_social_emisor   String?
+  rut_emisor            String?
   fecha                 String?
+  fecha_vto             String?
   monto                 Float?
   moneda                String?
   cantidad              Int?      @default(1)
-  categoria             String?
+  rubro                 String?
   rut_receptor          String?
   razon_social_receptor String?
-  tipo_comprobante      String?
-  fecha_ejecucion       String?
   texto_extraido        Boolean   @default(false)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
-  @@index([proyectoId, periodo])
+  @@index([proyectoId])
 }
 
-model Cotizacion {
-  id        String   @id
-  fecha     String   @unique
-  valor_ui  Float
-  valor_usd Float
-  createdAt DateTime @default(now())
+model Rubro {
+  id                    String    @id @default(uuid())
+  codigo_rubro          String?
+  descripcion           String
 }

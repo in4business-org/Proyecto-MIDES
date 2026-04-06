@@ -8,9 +8,6 @@ const path = require('path');
 const empresaRoutes = require('./modules/empresa/empresa.routes');
 const proyectoRoutes = require('./modules/proyecto/proyecto.routes');
 const facturaRoutes = require('./modules/factura/factura.routes');
-const checklistRoutes = require('./modules/checklist/checklist.routes');
-const simuladorRoutes = require('./modules/simulador/simulador.routes');
-const cotizacionRoutes = require('./modules/cotizacion/cotizacion.routes');
 
 const app = express();
 
@@ -28,9 +25,6 @@ const requireAuth = require('./middleware/auth.middleware');
 app.use('/api/empresas', requireAuth, empresaRoutes);
 app.use('/api/empresas/:empresaId/proyectos', requireAuth, proyectoRoutes);
 app.use('/api', requireAuth, facturaRoutes);
-app.use('/api/empresas/:empresaId/proyectos/:proyectoId/checklist', requireAuth, checklistRoutes);
-app.use('/api/empresas/:empresaId/proyectos/:proyectoId/simulador', requireAuth, simuladorRoutes);
-app.use('/api/cotizaciones', requireAuth, cotizacionRoutes);
 
 // ── Health check ───────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
@@ -44,7 +38,7 @@ app.get('/api/stats', async (_req, res) => {
   try {
     const empresas = await prisma.empresa.count();
     const proyectos = await prisma.proyecto.count();
-    const facturas = await prisma.factura.count({ where: { texto_extraido: true }});
+    const facturas = await prisma.factura.count({ where: { texto_extraido: true } });
     res.json({ empresas, proyectos, facturas });
   } catch (e) {
     res.json({ empresas: 0, proyectos: 0, facturas: 0 });

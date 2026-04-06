@@ -93,7 +93,6 @@ export default function Empresas() {
               <tr className="border-b border-border bg-muted/50">
                 <th className="text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground px-4 py-2.5">Empresa</th>
                 <th className="text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground px-4 py-2.5 hidden sm:table-cell">RUT</th>
-                <th className="text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground px-4 py-2.5 hidden md:table-cell">Giro</th>
                 <th className="w-10"></th>
               </tr>
             </thead>
@@ -109,7 +108,6 @@ export default function Empresas() {
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-sm text-muted-foreground font-mono hidden sm:table-cell">{emp.rut}</td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground truncate max-w-[200px] hidden md:table-cell">{emp.giro || '--'}</td>
                   <td className="px-4 py-3">
                     <Link to={`/empresas/${emp.id}`}>
                       <ArrowUpRight size={14} className="text-muted-foreground/30 group-hover:text-foreground transition-colors" />
