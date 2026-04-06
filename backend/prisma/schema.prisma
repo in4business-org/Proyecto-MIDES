@@ -62,6 +62,6 @@ model Factura {
 
 model Rubro {
   id                    String    @id @default(uuid())
-  codigo_rubro          String?   @unique
+  codigo_rubro          String?
   descripcion           String
 }
